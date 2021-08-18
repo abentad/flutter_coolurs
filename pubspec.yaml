@@ -1,47 +1,22 @@
 name: coolurs
 description: A new Flutter project.
-publish_to: 'none' 
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter  
   cupertino_icons: ^1.0.2
+  flutter:
+    sdk: flutter
+  get: ^4.3.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-flutter:  
-  uses-material-design: true  
+flutter:
+  uses-material-design: true
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-
-  
-  
-
-  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  

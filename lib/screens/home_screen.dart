@@ -1,72 +1,9 @@
-import 'dart:math';
-
+import 'package:coolurs/controllers/colors_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  }
-
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toRadixString(16).padLeft(2, '0')}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late List<Color> choices = [];
-  late Color correctColor;
-  late String correctColorHexString = "";
-  late int correctColorIndex;
-  int correctCounter = 0;
-  int incorrectCounter = 0;
-
-  void createColor() {
-    setState(() {
-      choices.clear();
-    });
-    for (int i = 0; i < 4; i++) {
-      setState(() {
-        correctColorIndex = Random().nextInt(4);
-      });
-      late int i1 = Random().nextInt(10);
-      late int i2 = Random().nextInt(10);
-      late int i3 = Random().nextInt(10);
-      late int i4 = Random().nextInt(10);
-      late int i5 = Random().nextInt(10);
-      late int i6 = Random().nextInt(10);
-      if (i == correctColorIndex) {
-        setState(() {
-          correctColorHexString = "#${i1.toString()}${i2.toString()}${i3.toString()}${i4.toString()}${i5.toString()}${i6.toString()}";
-        });
-      }
-      setState(() {
-        choices.add(HexColor.fromHex("#${i1.toString()}${i2.toString()}${i3.toString()}${i4.toString()}${i5.toString()}${i6.toString()}"));
-      });
-    }
-    setState(() {
-      correctColor = choices[correctColorIndex];
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    createColor();
-  }
+class HomeScreen extends StatelessWidget {
+  final ColorsController _colorsController = Get.find<ColorsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -80,71 +17,96 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                correctCounter = 0;
-                incorrectCounter = 0;
-              });
-              createColor();
+              _colorsController.setCorrectIndicator(0);
+              _colorsController.setIncorrectIndicator(0);
+              _colorsController.createColor();
             },
             icon: Icon(Icons.refresh),
-            color: Colors.black,
+            color: Colors.red,
+            iconSize: 26.0,
           ),
         ],
       ),
       body: SafeArea(
-        child: choices.isEmpty
-            ? Center(child: CircularProgressIndicator())
-            : Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: size.height * 0.1),
-                    Text(correctColorHexString == "" ? "" : correctColorHexString, style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600, color: Colors.black)),
-                    SizedBox(height: size.height * 0.05),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(correctCounter.toString(), style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600, color: Colors.green)),
-                        SizedBox(width: size.width * 0.2),
-                        Text(incorrectCounter.toString(), style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600, color: Colors.red)),
-                      ],
-                    ),
-                    SizedBox(height: size.height * 0.05),
-                    Container(
-                      height: size.height * 0.5,
-                      child: ListView.builder(
-                        itemCount: choices.length,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: MaterialButton(
-                            minWidth: double.infinity,
-                            height: 70.0,
-                            onPressed: () {
-                              if (HexColor.fromHex(correctColorHexString) == choices[index]) {
-                                // ignore: unnecessary_statements
-                                setState(() {
-                                  correctCounter++;
-                                });
-                                createColor();
-                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar((SnackBar(content: Text('Correct', style: TextStyle(color: Colors.green)))));
-                              } else {
-                                setState(() {
-                                  incorrectCounter++;
-                                });
-                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong', style: TextStyle(color: Colors.red))));
-                              }
-                            },
-                            color: choices[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            children: [
+              SizedBox(height: size.height * 0.05),
+              GetBuilder<ColorsController>(
+                builder: (controller) => Text(
+                  controller.correctColorHexString == "" ? "" : controller.correctColorHexString,
+                  style: TextStyle(fontSize: 38.0, fontWeight: FontWeight.w600, color: Colors.black),
                 ),
               ),
+              SizedBox(height: size.height * 0.05),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GetBuilder<ColorsController>(
+                    builder: (controller) =>
+                        Text(controller.correctCounterIndicator.toString(), style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600, color: Colors.green)),
+                  ),
+                  SizedBox(width: size.width * 0.2),
+                  GetBuilder<ColorsController>(
+                    builder: (controller) =>
+                        Text(controller.incorrectCounterIndicator.toString(), style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600, color: Colors.red)),
+                  ),
+                ],
+              ),
+              SizedBox(height: size.height * 0.05),
+              Container(
+                height: size.height * 0.58,
+                child: GetBuilder<ColorsController>(
+                  builder: (controller) => ListView.builder(
+                    itemCount: controller.choices.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: MaterialButton(
+                        minWidth: double.infinity,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
+                        height: 80.0,
+                        onPressed: () {
+                          if (controller.correctColor == controller.choices[index]) {
+                            controller.setCorrectIndicator(controller.correctCounterIndicator + 1);
+                            controller.createColor();
+                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar((SnackBar(content: Text('Correct', style: TextStyle(color: Colors.green)))));
+                          } else {
+                            controller.setIncorrectIndicator(controller.incorrectCounterIndicator + 1);
+                            controller.setWrongAnswerCounter(controller.wrongAnswerCounter + 1);
+
+                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong', style: TextStyle(color: Colors.red))));
+                          }
+                          if (controller.wrongAnswerCounter == 3) {
+                            Get.defaultDialog(
+                              title: "You Lost",
+                              middleText: "Game over",
+                              // backgroundColor: Colors.green,
+                              // titleStyle: TextStyle(color: Colors.red),
+                              // middleTextStyle: TextStyle(color: Colors.redAccent),
+                              textCancel: "close",
+                              textConfirm: "Retry",
+                              onConfirm: () {
+                                _colorsController.setCorrectIndicator(0);
+                                _colorsController.setIncorrectIndicator(0);
+                                _colorsController.setWrongAnswerCounter(0);
+                                _colorsController.createColor();
+                                Get.back();
+                              },
+                            );
+                          }
+                        },
+                        color: controller.choices[index],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

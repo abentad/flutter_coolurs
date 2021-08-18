@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.coolurs">
    <application
-        android:label="coolurs"
+        android:label="Coolurs"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
